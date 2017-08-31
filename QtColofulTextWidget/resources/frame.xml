@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<frame name="早安卡">			<!-- 边框名称 -->
+    
+<!--   边框信息   -->
+    <postimage>cover1.png</postimage>   <!-- 边框封面 jpg/png -->
+    <framefile>frame_I.png</framefile>    <!-- 边框图片 png 边框长宽的像素必须是偶数-->
+<!--   视频信息-->
+    <video>
+        <left-pos>0</left-pos>   <!-- 视频在边框图片的X轴位置，单位为像素，以边框左上角为原点 -->
+        <top-pos>194</top-pos>   <!-- 视频在边框图片的y轴位置，单位为像素 -->  
+        <width>750</width>   <!-- 短视频在宽度，单位为像素 -->
+        <height>422</height> <!-- 短视频在高度，单位为像素 -->  
+    </video>
+    
+<!--   可编辑内容信息，一期版本仅一处文案修改 -->
+    
+    <text name="日期">       <!-- 编辑文本的名称 -->
+        <left-pos>100</left-pos>   <!-- 文本在边框中的X轴的位置 -->
+        <top-pos>194</top-pos>   <!-- 文本在边框中的y轴的位置 -->
+        <size>200</size>    <!--   可编辑文本长度，字符 -->
+        <color>#00ff00</color>   <!--   字体的颜色 -->
+        <fontsize>25</fontsize>    <!--   字符的大小，计像素px -->
+        <family>微软雅黑</family>    <!-- 字体样式，若字体不存在默认为微软雅黑 -->
+        <weight>1</weight>   <!--   是否粗体，0为正常，1为粗体  -->
+        <italic>0</italic>     <!--   是否斜体，0为正常，1为粗体 -->
+        <underline>1</underline>     <!--   是否下划线，0为无，1为有下划线 -->
+        <opacity>100</opacity>       <!--   文字透明度  0-100  默认100不透明 -->
+        <shadow>2,2,2,#a32749</shadow>     <!--   水平轴位置 垂直轴位置 模糊距离 颜色 -->
+        <placeholder>8月23日</placeholder>
+    </text>
+</frame>
