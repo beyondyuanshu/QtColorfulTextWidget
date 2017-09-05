@@ -20,6 +20,8 @@ public:
     void setAutoResize(bool enable);
     void setDragable(bool enable);
 
+    QPixmap textToPixmap();
+
     static QList< QMap<QString, QString> > setColorfulByFrameXml(const QString &path, QString &erro);
 
 signals:

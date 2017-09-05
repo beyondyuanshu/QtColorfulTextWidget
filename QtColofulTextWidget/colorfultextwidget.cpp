@@ -51,6 +51,11 @@ void ColorfulTextWidget::setDragable(bool enable)
     bDragable = enable;
 }
 
+QPixmap ColorfulTextWidget::textToPixmap()
+{
+    return grab();
+}
+
 QList<QMap<QString, QString> > ColorfulTextWidget::setColorfulByFrameXml(const QString &path, QString &erro)
 {
     QList< QMap<QString, QString> > propertiesList;
