@@ -4,7 +4,7 @@
 #include <QXmlStreamReader>
 #include <QFileInfo>
 #include <QMouseEvent>
-#include <QTimer>
+#include <QGraphicsEffect>
 #include <QDebug>
 
 ColorfulTextWidget::ColorfulTextWidget(QWidget *parent) : QWidget(parent)
@@ -53,7 +53,19 @@ void ColorfulTextWidget::setDragable(bool enable)
 
 QPixmap ColorfulTextWidget::textToPixmap()
 {
-    return grab();
+    int xOffset = 0;
+    int yOffset = 0;
+
+#ifndef QT_NO_GRAPHICSEFFECT
+    QGraphicsEffect *effect = graphicsEffect();
+    QGraphicsDropShadowEffect *dropShadowEffect = qobject_cast<QGraphicsDropShadowEffect *>(effect);
+    if (dropShadowEffect != NULL) {
+        xOffset = dropShadowEffect->xOffset();
+        yOffset = dropShadowEffect->yOffset();
+    }
+#endif //QT_NO_GRAPHICSEFFECT
+
+    return grab(QRect(0, 0, rect().width() + xOffset, rect().height() + yOffset));
 }
 
 QList<QMap<QString, QString> > ColorfulTextWidget::setColorfulByFrameXml(const QString &path, QString &erro)
@@ -113,23 +125,49 @@ void ColorfulTextWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
 
-    QString text = !m_text.isEmpty() ? m_text : m_holderText;
-
-    if (bAutoResize) {
-        QFontMetrics fm(font());
-        int pixelsWide = fm.width(QString(" %1 ").arg(text));  // be sure the size is not (0, 0), this not update.
-        int pixelsHigh = fm.height();
-        resize(pixelsWide, pixelsHigh);
-    }
-
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
     painter.save();
     painter.setFont(font());
     painter.setPen(m_pen);
-    painter.drawText(rect(), alignmentFlag, text);
+    QTextOption option;
+    option.setAlignment(alignmentFlag);
+    option.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+
+    QString text = !m_text.isEmpty() ? m_text : m_holderText;
+    if (bAutoResize) {
+        QFontMetrics fm(font());
+        // calc width
+        int fmWidth = fm.width(text);
+        int fmBoundingWidth = fm.boundingRect(text).width();
+        int painterBoundingWidth = painter.boundingRect(rect(), text, option).width();
+        int width = qMax(qMax(fmWidth, fmBoundingWidth), painterBoundingWidth);
+//        qDebug() << QString("fmWidth,fmBoundingWidth,painterBoundingWidth:%1,%2,%3").arg(fmWidth).arg(fmBoundingWidth).arg(painterBoundingWidth);
+
+        // calc height
+        int ratio = 0;
+        if (maximumHeight() != 0) {
+            ratio = width / maximumWidth() + ((width % maximumWidth()) != 0);
+        }
+        int ratioHeight = fm.height() * ratio;
+        int painterBoundingHeight = painter.boundingRect(rect(), text, option).height();
+        int height = qMax(ratioHeight, painterBoundingHeight);
+//        qDebug() << QString("ratioHeight,painterBoundingHeight:%1,%2").arg(ratioHeight).arg(painterBoundingHeight);
+
+        resize(width, height);
+
+        // modify size
+        if (this->width() == 0 || this->height() == 0) {
+//            qDebug() << "modify size.";
+            resize(1, 1);  // ensure visible, so update immediately.
+        }
+    }
+
+    painter.drawText(rect(), text, option);
     painter.restore();
+
+    QWidget::paintEvent(event);
 }
 
 void ColorfulTextWidget::mousePressEvent(QMouseEvent *event)
